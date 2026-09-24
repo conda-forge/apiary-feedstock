@@ -1,9 +1,9 @@
 context:
-  version: "1.0.0"
+  version: "1.1.0"
   # LLVM/Clang major apiary's libTooling code is built against. apiary is a leaf
   # *tool* — consumers run it, they do not link its LLVM — so it may pin its own
   # toolchain independent of the rest of an environment.
-  llvm_major: "22"
+  llvm_major: "23"
 
 package:
   name: apiary
@@ -11,7 +11,7 @@ package:
 
 source:
   url: https://github.com/Einsums/Apiary/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 3dd50a38af85f9e47ade73981caffb26ca7d36e4cfc52db1decf68ef4a113199
+  sha256: 23a0a6ff0cfbb760b1a2605bfc686c776ce8934d47b8b807cc0f72a6828181c9
 
 build:
   number: 0
