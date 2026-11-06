@@ -4,7 +4,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(find_apiary LANGUAGES NONE)
 
-find_package(Apiary 1.3.1 REQUIRED CONFIG COMPONENTS annotations)
+find_package(Apiary 1.4.0 REQUIRED CONFIG COMPONENTS annotations)
 if(NOT TARGET apiary::annotations)
     message(FATAL_ERROR "find_package(Apiary) gave no apiary::annotations")
 endif()
@@ -16,8 +16,17 @@ if(NOT _n EQUAL 1 OR NOT EXISTS "${_incs}/apiary/Annotations.hpp")
     message(FATAL_ERROR "apiary::annotations should name the one directory holding apiary/Annotations.hpp, not: ${_incs}")
 endif()
 
+# The binding-library helpers and the header for hand-written binding code come
+# with the annotations, so either package has them.
+if(NOT COMMAND apiary_find_backend OR NOT COMMAND apiary_add_extension_module)
+    message(FATAL_ERROR "find_package(Apiary) gave no apiary_find_backend / apiary_add_extension_module")
+endif()
+if(NOT EXISTS "${_incs}/apiary/Python.hpp")
+    message(FATAL_ERROR "apiary::annotations names ${_incs}, which has no apiary/Python.hpp")
+endif()
+
 if(EXPECT_TOOL)
-    find_package(Apiary 1.3.1 REQUIRED CONFIG COMPONENTS tool)
+    find_package(Apiary 1.4.0 REQUIRED CONFIG COMPONENTS tool)
     if(NOT TARGET apiary::apiary OR NOT COMMAND apiary_add_bindings)
         message(FATAL_ERROR "the tool component lacks apiary::apiary or the helpers")
     endif()
