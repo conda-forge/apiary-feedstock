@@ -1,5 +1,5 @@
 context:
-  version: "1.3.1"
+  version: "1.4.0"
   # LLVM/Clang major apiary's libTooling code is built against. apiary is a leaf
   # *tool* - consumers run it, they do not link its LLVM - so it may pin its own
   # toolchain independent of the rest of an environment.
@@ -11,17 +11,20 @@ recipe:
 
 source:
   url: https://github.com/Einsums/Apiary/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 3edcd792091825280127e886774b808dfa84d2d2ec08d56b51dbff1976fe9918
+  sha256: b4758c2060985cc9d95ba8d1cfcbd0e9e011c7f9051019581f6365bfb9f56811
 
 build:
   number: 0
 
 # Apiary installs as two CMake components, and each output installs one:
 #   apiary-annotations - ApiaryAnnotations: the APIARY_* header, the
-#                        apiary::annotations target and the package config.
+#                        apiary::annotations target and the package config,
+#                        with the binding-library helpers (ApiaryBackend.cmake)
+#                        and <apiary/Python.hpp> for hand-written binding code.
 #                        No Clang/LLVM, so a library that only annotates its
-#                        declarations (and everything that links it) can
-#                        depend on this alone.
+#                        declarations (and everything that links it), or a
+#                        package building extension modules by hand against
+#                        one, can depend on this alone.
 #   apiary             - ApiaryTool: the codegen executable, the apiary_*
 #                        CMake helpers and their scripts, on top of
 #                        apiary-annotations.
@@ -70,16 +73,19 @@ outputs:
       - package_contents:
           include:
             - apiary/Annotations.hpp
+            - apiary/Python.hpp
           files:
             - if: unix
               then:
                 - lib/cmake/Apiary/ApiaryConfig.cmake
                 - lib/cmake/Apiary/ApiaryConfigVersion.cmake
                 - lib/cmake/Apiary/ApiaryTargets.cmake
+                - lib/cmake/Apiary/ApiaryBackend.cmake
               else:
                 - Library/lib/cmake/Apiary/ApiaryConfig.cmake
                 - Library/lib/cmake/Apiary/ApiaryConfigVersion.cmake
                 - Library/lib/cmake/Apiary/ApiaryTargets.cmake
+                - Library/lib/cmake/Apiary/ApiaryBackend.cmake
       # find_package(Apiary) finds the annotations and, with the tool not
       # installed, nothing of it.
       - files:
@@ -101,6 +107,12 @@ outputs:
         CMake package that provides it as the apiary::annotations target.
         A library annotated for Apiary needs only this, at build and run time;
         generating bindings needs the apiary package, which depends on it.
+
+        It also carries what building a Python extension by hand against an
+        Apiary-bound library takes: apiary_find_backend() and
+        apiary_add_extension_module(), which find and build with the binding
+        library APIARY_BACKEND names (pybind11 or nanobind), and
+        <apiary/Python.hpp>, which lets the module's C++ name neither.
 
   - package:
       name: apiary
@@ -232,7 +244,7 @@ outputs:
       summary: libclang/libtooling C++ introspection - pybind11 bindings, .pyi stubs, Sphinx docs, JSON IR
       description: |
         Apiary is a standalone libclang/libtooling tool that, from a single AST
-        walk over annotated C++ headers, emits pybind11 (or nanobind) bindings,
+        walk over annotated C++ headers, emits pybind11 or nanobind bindings,
         .pyi type stubs, Sphinx C++ API documentation (including macros, no
         Doxygen), and a structured public-API JSON IR.
 
