@@ -14,7 +14,7 @@ source:
   sha256: fde3562a9d336d878dd03dca909e1c579ed6d5a22b7f0d48097afcf83a5bb333
 
 build:
-  number: 1
+  number: 2
 
 # Apiary installs as two CMake components, and each output installs one:
 #   apiary-annotations - ApiaryAnnotations: the APIARY_* header, the
