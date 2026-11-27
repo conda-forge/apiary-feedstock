@@ -18,7 +18,7 @@ Development: https://github.com/Einsums/Apiary
 Documentation: https://einsums.github.io/Apiary/
 
 Apiary is a standalone libclang/libtooling tool that, from a single AST
-walk over annotated C++ headers, emits pybind11 (or nanobind) bindings,
+walk over annotated C++ headers, emits pybind11 or nanobind bindings,
 .pyi type stubs, Sphinx C++ API documentation (including macros, no
 Doxygen), and a structured public-API JSON IR.
 
@@ -45,6 +45,12 @@ APIARY_* macros mark C++ declarations for Apiary's codegen, and the
 CMake package that provides it as the apiary::annotations target.
 A library annotated for Apiary needs only this, at build and run time;
 generating bindings needs the apiary package, which depends on it.
+
+It also carries what building a Python extension by hand against an
+Apiary-bound library takes: apiary_find_backend() and
+apiary_add_extension_module(), which find and build with the binding
+library APIARY_BACKEND names (pybind11 or nanobind), and
+<apiary/Python.hpp>, which lets the module's C++ name neither.
 
 Current build status
 ====================
